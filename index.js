@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const path = require("path");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -20,6 +21,16 @@ app.use(shopRoutes);
 
 app.use(error404.get404Page);
 
-app.listen(3000, () => {
-  console.log("server running on 3000");
-});
+mongoose
+  .connect(
+    //use %40 if your password contains @
+    "mongodb+srv://dhruv:mongoDbkaa123@mern.vhrrq.mongodb.net/ShopDb?retryWrites=true&w=majority"
+  )
+  .then((result) => {
+    app.listen(3000, () => {
+      console.log("server running on 3000");
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
