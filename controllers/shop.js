@@ -45,18 +45,32 @@ function getIndex(req, res, next) {
 }
 
 function getCart(req, res, next) {
-  res.render("shop/cart", {
-    path: "/cart",
-    docTitle: "Your Cart",
-  });
+  req.user
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then((user) => {
+      const products = user.cart.items;
+      res.render("shop/cart", {
+        path: "/cart",
+        docTitle: "Your Cart",
+        products: products,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 function postCart(req, res, next) {
   const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.addProduct(prodId, product.price);
-  });
-  res.redirect("/cart");
+  Product.findById(prodId)
+    .then((product) => {
+      return req.user.addToCart(product);
+    })
+    .then((result) => {
+      console.log(result);
+      res.redirect("/cart");
+    });
 }
 
 function getCheckout(req, res, next) {
