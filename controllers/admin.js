@@ -68,10 +68,17 @@ function getProducts(req, res, next) {
   });
 }
 
+function postDeleteProduct(req, res, next) {
+  const prodId = req.body.productId;
+  Product.deleteById(prodId);
+  res.redirect("/admin/products");
+}
+
 module.exports = {
   getAddProduct,
   postAddProduct,
   getProducts,
   getEditProduct,
   postEditProducts,
+  postDeleteProduct,
 };
