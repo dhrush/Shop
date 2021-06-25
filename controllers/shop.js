@@ -9,6 +9,7 @@ function getProducts(req, res, next) {
         prods: products,
         docTitle: "All Products",
         path: "/products",
+        isAuthenticated: false
       });
     })
     .catch((err) => {
@@ -24,6 +25,7 @@ function getProduct(req, res, next) {
         product: product,
         docTitle: product.title,
         path: "/products",
+        isAuthenticated: false
       });
     })
     .catch((err) => {
@@ -38,6 +40,7 @@ function getIndex(req, res, next) {
         prods: products,
         docTitle: "My Shop",
         path: "/",
+        isAuthenticated: false
       });
     })
     .catch((err) => {
@@ -55,6 +58,7 @@ function getCart(req, res, next) {
         path: "/cart",
         docTitle: "Your Cart",
         products: products,
+        isAuthenticated: false
       });
     })
     .catch((err) => {
@@ -116,6 +120,7 @@ function getCheckout(req, res, next) {
   res.render("shop/checkout", {
     path: "/checkout",
     docTitle: "Checkout",
+    isAuthenticated: false
   });
 }
 
@@ -126,6 +131,7 @@ function getOrders(req, res, next) {
         path: "/orders",
         docTitle: "My Orders",
         orders: orders,
+        isAuthenticated: false
       });
     })
     .catch((err) => {

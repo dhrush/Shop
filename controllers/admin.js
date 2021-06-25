@@ -5,6 +5,7 @@ function getAddProduct(req, res, next) {
     docTitle: "Add Product",
     path: "/admin/add-product",
     editing: false,
+    isAuthenticated: false,
   });
 }
 
@@ -49,6 +50,7 @@ function getEditProduct(req, res, next) {
         path: "/admin/edit-product",
         editing: editMode,
         product: product,
+        isAuthenticated: false,
       });
     })
     .catch((err) => {
@@ -88,6 +90,7 @@ function getProducts(req, res, next) {
         prods: products,
         docTitle: "Admin Products",
         path: "/admin/products",
+        isAuthenticated: false,
       });
     })
     .catch((err) => {
