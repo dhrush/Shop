@@ -55,22 +55,10 @@ app.use(authRoutes);
 
 app.use(error404.get404Page);
 
+//use %40 if your password contains @
 mongoose
-  .connect(
-    //use %40 if your password contains @
-    MONGODB_URI
-  )
+  .connect(MONGODB_URI)
   .then((result) => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: "Mux",
-          email: "muxOccupancy@120people.com",
-          items: [],
-        });
-        user.save();
-      }
-    });
     app.listen(3000, () => {
       console.log("server running on 3000");
     });

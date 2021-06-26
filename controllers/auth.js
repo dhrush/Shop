@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 const User = require("../models/user");
 
 function getLogin(req, res, next) {
@@ -29,7 +31,58 @@ function postLogin(req, res, next) {
     .catch((err) => console.log(err));
 }
 
-function postSignup(req, res, next) {}
+async function postSignup(req, res, next) {
+  const email = req.body.email;
+  const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
+
+  //two ways to confirm that if user exists
+  // 1. indexing on email in our mongo db
+  // 2. finding if email exists
+
+  //Implementing second way
+  /*User.findOne({ email: email })
+    .then((userDoc) => {
+      if (userDoc) {
+        return res.redirect("/signup");
+      }
+      return bcrypt.hash(password, 12);
+    })
+    .then((hashedPassword) => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      res.redirect("/login");
+    })
+    .catch((err) => {
+      console.log(err);
+    });*/
+  const userDoc = await User.findOne({ email: email });
+  if (userDoc) {
+    return res.redirect("/login");
+  } else {
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const user = new User({
+      email: email,
+      password: hashedPassword,
+      cart: { items: [] },
+    });
+
+    return user
+      .save()
+      .then((result) => {
+        res.redirect("/login");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+}
 
 function postLogout(req, res, next) {
   req.session.destroy((err) => {
