@@ -1,13 +1,22 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
+
 const User = require("./models/user");
 const path = require("path");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 const error404 = require("./controllers/error");
+const MONGODB_URI =
+  "mongodb+srv://dhruv:mongoDbkaa123@mern.vhrrq.mongodb.net/ShopDb?retryWrites=true&w=majority";
 
 const app = express();
+const store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: "sessions",
+});
 
 //use view engine --> pug
 app.set("view engine", "ejs");
@@ -17,9 +26,20 @@ app.set("views", "views");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  session({
+    secret: "my secret",
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+  })
+);
 
 app.use((req, res, next) => {
-  User.findById("60d36cf74dea0c2c48727032")
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
     .then((user) => {
       req.user = user;
       next();
@@ -38,7 +58,7 @@ app.use(error404.get404Page);
 mongoose
   .connect(
     //use %40 if your password contains @
-    "mongodb+srv://dhruv:mongoDbkaa123@mern.vhrrq.mongodb.net/ShopDb?retryWrites=true&w=majority"
+    MONGODB_URI
   )
   .then((result) => {
     User.findOne().then((user) => {

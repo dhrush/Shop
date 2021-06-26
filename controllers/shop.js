@@ -1,5 +1,4 @@
 const Product = require("../models/product");
-const Cart = require("../models/cart");
 const Order = require("../models/order");
 
 function getProducts(req, res, next) {
@@ -9,7 +8,7 @@ function getProducts(req, res, next) {
         prods: products,
         docTitle: "All Products",
         path: "/products",
-        isAuthenticated: false
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -25,7 +24,7 @@ function getProduct(req, res, next) {
         product: product,
         docTitle: product.title,
         path: "/products",
-        isAuthenticated: false
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -40,7 +39,7 @@ function getIndex(req, res, next) {
         prods: products,
         docTitle: "My Shop",
         path: "/",
-        isAuthenticated: false
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -58,7 +57,7 @@ function getCart(req, res, next) {
         path: "/cart",
         docTitle: "Your Cart",
         products: products,
-        isAuthenticated: false
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -95,7 +94,6 @@ function postOrder(req, res, next) {
     .populate("cart.items.productId")
     .execPopulate()
     .then((user) => {
-      console.log(user.cart.items);
       const products = user.cart.items.map((i) => {
         return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
@@ -120,7 +118,7 @@ function getCheckout(req, res, next) {
   res.render("shop/checkout", {
     path: "/checkout",
     docTitle: "Checkout",
-    isAuthenticated: false
+    isAuthenticated: req.session.isLoggedIn,
   });
 }
 
@@ -131,7 +129,7 @@ function getOrders(req, res, next) {
         path: "/orders",
         docTitle: "My Orders",
         orders: orders,
-        isAuthenticated: false
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
