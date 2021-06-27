@@ -18,50 +18,31 @@ function getSignup(req, res, next) {
   });
 }
 
-function postLogin(req, res, next) {
-  User.findById("60d36cf74dea0c2c48727032")
-    .then((user) => {
+async function postLogin(req, res, next) {
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = await User.findOne({ email: email });
+  if (user) {
+    const doMatch = await bcrypt.compare(password, user.password);
+    if (doMatch) {
       req.session.isLoggedIn = true;
       req.session.user = user;
-      req.session.save((err) => {
+      return req.session.save((err) => {
         console.log(err);
         res.redirect("/");
       });
-    })
-    .catch((err) => console.log(err));
+    } else {
+      res.redirect("/login");
+    }
+  } else {
+    return res.redirect("/login");
+  }
 }
 
 async function postSignup(req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
-
-  //two ways to confirm that if user exists
-  // 1. indexing on email in our mongo db
-  // 2. finding if email exists
-
-  //Implementing second way
-  /*User.findOne({ email: email })
-    .then((userDoc) => {
-      if (userDoc) {
-        return res.redirect("/signup");
-      }
-      return bcrypt.hash(password, 12);
-    })
-    .then((hashedPassword) => {
-      const user = new User({
-        email: email,
-        password: hashedPassword,
-        cart: { items: [] },
-      });
-      return user.save();
-    })
-    .then((result) => {
-      res.redirect("/login");
-    })
-    .catch((err) => {
-      console.log(err);
-    });*/
   const userDoc = await User.findOne({ email: email });
   if (userDoc) {
     return res.redirect("/login");
