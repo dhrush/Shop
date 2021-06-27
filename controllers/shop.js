@@ -8,7 +8,6 @@ function getProducts(req, res, next) {
         prods: products,
         docTitle: "All Products",
         path: "/products",
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -24,7 +23,6 @@ function getProduct(req, res, next) {
         product: product,
         docTitle: product.title,
         path: "/products",
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -39,7 +37,6 @@ function getIndex(req, res, next) {
         prods: products,
         docTitle: "My Shop",
         path: "/",
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -98,7 +95,7 @@ function postOrder(req, res, next) {
         return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
       const order = new Order({
-        user: { name: req.user.name, userId: req.user },
+        user: { email: req.user.email, userId: req.user },
         products: products,
       });
       return order.save();
@@ -118,7 +115,7 @@ function getCheckout(req, res, next) {
   res.render("shop/checkout", {
     path: "/checkout",
     docTitle: "Checkout",
-    isAuthenticated: req.session.isLoggedIn,
+    //isAuthenticated: req.session.isLoggedIn,
   });
 }
 
@@ -129,7 +126,6 @@ function getOrders(req, res, next) {
         path: "/orders",
         docTitle: "My Orders",
         orders: orders,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {

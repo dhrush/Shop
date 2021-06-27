@@ -5,7 +5,6 @@ function getAddProduct(req, res, next) {
     docTitle: "Add Product",
     path: "/admin/add-product",
     editing: false,
-    isAuthenticated: req.session.isLoggedIn,
   });
 }
 
@@ -50,7 +49,6 @@ function getEditProduct(req, res, next) {
         path: "/admin/edit-product",
         editing: editMode,
         product: product,
-        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
