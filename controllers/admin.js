@@ -65,16 +65,18 @@ function postEditProducts(req, res, next) {
 
   Product.findById(id)
     .then((product) => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect("/");
+      }
       product.title = updatedTitle;
       product.imageUrl = updatedImageUrl;
       product.price = updatedPrice;
       product.description = updatedDescription;
 
-      return product.save();
-    })
-    .then((result) => {
-      console.log("PRODUCT UDPATED");
-      res.redirect("/admin/products");
+      return product.save().then((result) => {
+        console.log("PRODUCT UDPATED");
+        res.redirect("/admin/products");
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -82,7 +84,7 @@ function postEditProducts(req, res, next) {
 }
 
 function getProducts(req, res, next) {
-  Product.find()
+  Product.find({ userId: req.user._id })
     .then((products) => {
       res.render("admin/products", {
         prods: products,
@@ -98,7 +100,7 @@ function getProducts(req, res, next) {
 
 function postDeleteProduct(req, res, next) {
   const prodId = req.body.productId;
-  Product.findByIdAndRemove(prodId)
+  Product.deleteOne({ _id: prodId, userId: req.user._id })
     .then((product) => {
       console.log("PRODUCT REMOVED");
       res.redirect("/admin/products");
