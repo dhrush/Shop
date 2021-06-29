@@ -10,7 +10,7 @@ const path = require("path");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
-const error404 = require("./controllers/error");
+const errorController = require("./controllers/error");
 const MONGODB_URI =
   "mongodb+srv://dhruv:mongoDbkaa123@mern.vhrrq.mongodb.net/ShopDb?retryWrites=true&w=majority";
 
@@ -52,7 +52,8 @@ app.use((req, res, next) => {
       next();
     })
     .catch((err) => {
-      console.log(err);
+      next(new Error(err));
+      //console.log(err);
     });
 });
 
@@ -65,8 +66,16 @@ app.use((req, res, next) => {
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
-
-app.use(error404.get404Page);
+app.use("/500", errorController.get500Page);
+app.use(errorController.get404Page);
+app.use((error, req, res, next) => {
+  // res.status(error.httpStatusCode).render();
+  res.status(500).render("500", {
+    docTitle: "Error!!",
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn,
+  });
+});
 
 //use %40 if your password contains @
 mongoose

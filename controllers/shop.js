@@ -11,7 +11,9 @@ function getProducts(req, res, next) {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 }
 
@@ -26,7 +28,9 @@ function getProduct(req, res, next) {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 }
 
@@ -40,7 +44,9 @@ function getIndex(req, res, next) {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 }
 
@@ -58,7 +64,9 @@ function getCart(req, res, next) {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 }
 
@@ -71,6 +79,11 @@ function postCart(req, res, next) {
     .then((result) => {
       console.log(result);
       res.redirect("/cart");
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 }
 
@@ -82,7 +95,9 @@ function postCartDeleteProduct(req, res, next) {
       res.redirect("/cart");
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 }
 
@@ -107,7 +122,9 @@ function postOrder(req, res, next) {
       res.redirect("/orders");
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 }
 
@@ -129,7 +146,9 @@ function getOrders(req, res, next) {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 }
 

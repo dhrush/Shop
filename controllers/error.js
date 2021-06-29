@@ -6,4 +6,12 @@ function get404Page(req, res, next) {
   });
 }
 
-module.exports = { get404Page };
+function get500Page(req, res, next) {
+  res.status(500).render("500", {
+    docTitle: "Error!!",
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn,
+  });
+}
+
+module.exports = { get404Page, get500Page };
