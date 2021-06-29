@@ -2,6 +2,8 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const sendGridTransport = require("nodemailer-sendgrid-transport");
+const { validationResult } = require("express-validator/check");
+
 const User = require("../models/user");
 
 const transporter = nodemailer.createTransport(
@@ -37,63 +39,91 @@ function getSignup(req, res, next) {
     path: "/signup",
     docTitle: "Signup",
     errorMessage: message,
+    oldInput: { email: "", password: "", confirmPassword: "" },
+    validationErrors: [],
   });
 }
 
-async function postLogin(req, res, next) {
+function postLogin(req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
-  const user = await User.findOne({ email: email });
-  if (user) {
-    const doMatch = await bcrypt.compare(password, user.password);
-    if (doMatch) {
-      req.session.isLoggedIn = true;
-      req.session.user = user;
-      return req.session.save((err) => {
-        console.log(err);
-        res.redirect("/");
-      });
-    } else {
-      req.flash("error", "Incorrect email or password.");
-      res.redirect("/login");
-    }
-  } else {
-    req.flash("error", "Invalid email or password.");
-    return res.redirect("/login");
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      docTitle: "Login",
+      errorMessage: errors.array()[0].msg,
+    });
   }
+
+  User.findOne({ email: email })
+    .then((user) => {
+      if (!user) {
+        req.flash("error", "Invalid email or password.");
+        return res.redirect("/login");
+      }
+      bcrypt
+        .compare(password, user.password)
+        .then((doMatch) => {
+          if (doMatch) {
+            req.session.isLoggedIn = true;
+            req.session.user = user;
+            return req.session.save((err) => {
+              console.log(err);
+              res.redirect("/");
+            });
+          }
+          req.flash("error", "Invalid email or password.");
+          res.redirect("/login");
+        })
+        .catch((err) => {
+          console.log(err);
+          res.redirect("/login");
+        });
+    })
+    .catch((err) => console.log(err));
 }
 
-async function postSignup(req, res, next) {
+function postSignup(req, res, next) {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
-  const userDoc = await User.findOne({ email: email });
-  if (userDoc) {
-    req.flash("error", "Email already exists.");
-    return res.redirect("/signup");
-  } else {
-    const hashedPassword = await bcrypt.hash(password, 12);
-    const user = new User({
-      email: email,
-      password: hashedPassword,
-      cart: { items: [] },
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      docTitle: "Signup",
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email: email,
+        password: password,
+        confirmPassword: req.body.confirmPassword,
+      },
+      validationErrors: errors.array(),
     });
-
-    return user
-      .save()
-      .then((result) => {
-        res.redirect("/login");
-        return transporter.sendMail({
-          to: email,
-          from: "labssem51@gmail.com",
-          subject: "Signup Successful",
-          html: "<h1>You successfully signed up!</h1>",
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   }
+  bcrypt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const user = new User({
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] },
+      });
+      return user.save();
+    })
+    .then((result) => {
+      res.redirect("/login");
+      return transporter.sendMail({
+        to: email,
+        from: "labssem51@gmail.com",
+        subject: "Signup Successful",
+        html: "<h1>You successfully signed up!</h1>",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 function postLogout(req, res, next) {
