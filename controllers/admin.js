@@ -173,17 +173,15 @@ function getProducts(req, res, next) {
     });
 }
 
-function postDeleteProduct(req, res, next) {
-  const prodId = req.body.productId;
+function deleteProduct(req, res, next) {
+  const prodId = req.params.productId;
   Product.deleteOne({ _id: prodId, userId: req.user._id })
     .then((product) => {
       console.log("PRODUCT REMOVED");
-      res.redirect("/admin/products");
+      res.status(200).json({ message: "Success!" });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+      res.status(500).json({ message: "Deleting Product failed!" });
     });
 }
 
@@ -193,5 +191,5 @@ module.exports = {
   getProducts,
   getEditProduct,
   postEditProducts,
-  postDeleteProduct,
+  deleteProduct,
 };
