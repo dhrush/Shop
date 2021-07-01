@@ -88,5 +88,3 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-
-//60d3658c5e1b7e2f1869edf5
