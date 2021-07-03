@@ -18,5 +18,7 @@ Project is created with:
 * ejs: v3.1.6
 
 ## Illustrations
+* This is the home page of the project where you can browse through all the products
 ![Home Page](https://github.com/dhrush/Shop/blob/master/pic_1.png?raw=true)
+* This is the add product page where a logged in user can add the product to sell.
 ![Add product Page](https://github.com/dhrush/Shop/blob/master/pic_2.png?raw=true)
